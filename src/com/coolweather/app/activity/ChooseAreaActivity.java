@@ -5,8 +5,10 @@ import java.util.List;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -58,10 +60,6 @@ public class ChooseAreaActivity extends Activity {
 	private City selectedCity;
 
 	/**
-	 * 选中的县
-	 */
-	private County selectedCounty;
-	/**
 	 * 当前选中的级别
 	 */
 	private int currentLevel;
@@ -70,6 +68,14 @@ public class ChooseAreaActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
+		SharedPreferences pref = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		if (pref.getBoolean("city_selected", false)) {
+			Intent intent = new Intent(this, WeatherActivity.class);
+			startActivity(intent);
+			finish();
+			return;
+		}
 		// 取消標題欄
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.choose_area);
@@ -92,6 +98,13 @@ public class ChooseAreaActivity extends Activity {
 				} else if (currentLevel == LEVEL_CITY) {
 					selectedCity = cityList.get(position);
 					queryCounties();
+				} else if (currentLevel == LEVEL_COUNTY) {
+					String countyCode = countyList.get(position)
+							.getCountyCode();
+					Intent intent = new Intent(ChooseAreaActivity.this,
+							WeatherActivity.class);
+					intent.putExtra("county_code", countyCode);
+					startActivity(intent);
 				}
 
 			}
@@ -221,7 +234,7 @@ public class ChooseAreaActivity extends Activity {
 						closeProgressDialog();
 						Toast.makeText(ChooseAreaActivity.this, "加载失败...",
 								Toast.LENGTH_SHORT).show();
-					} 
+					}
 				});
 
 			}
