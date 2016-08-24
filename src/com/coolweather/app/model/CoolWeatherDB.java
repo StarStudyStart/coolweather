@@ -7,6 +7,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.coolweather.app.db.CoolWeatherOpenHelper;
 
@@ -60,7 +61,7 @@ public class CoolWeatherDB {
 		List<Province> provinces = new ArrayList<Province>();
 		Cursor cursor = db
 				.query("Province", null, null, null, null, null, null);
-		if (cursor.isFirst()) {
+		if (cursor.moveToFirst()) {
 			do {
 				Province province = new Province();
 				String provinceName = cursor.getString(cursor
@@ -101,13 +102,13 @@ public class CoolWeatherDB {
 		List<City> cities = new ArrayList<City>();
 		Cursor cursor = db.query("City", null, "province_id = ?",
 				new String[] { String.valueOf(provinceId) }, null, null, null);
-		if (cursor.isFirst()) {
+		if (cursor.moveToFirst()) {
 			do {
 				City city = new City();
 				city.setCityCode(cursor.getString(cursor
-						.getColumnIndex("city_name")));
-				city.setCityName(cursor.getString(cursor
 						.getColumnIndex("city_code")));
+				city.setCityName(cursor.getString(cursor
+						.getColumnIndex("city_name")));
 				city.setId(cursor.getInt(cursor.getColumnIndex("id")));
 				city.setProvinceId(provinceId);
 				cities.add(city);
@@ -130,13 +131,13 @@ public class CoolWeatherDB {
 	}
 
 	/**
-	 * 从书库中读取某城市下所有县的信息
+	 * 从数据库中读取某城市下所有县的信息
 	 */
 	public List<County> loadCounty(int cityId) {
 		List<County> counties = new ArrayList<County>();
 		Cursor cursor = db.query("County", null, "city_id = ?",
 				new String[] { String.valueOf(cityId) }, null, null, null);
-		if (cursor.isFirst()) {
+		if (cursor.moveToFirst()) {
 			do {
 				County county = new County();
 				county.setCountyCode(cursor.getString(cursor

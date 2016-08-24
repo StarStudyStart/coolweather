@@ -1,6 +1,8 @@
 package com.coolweather.app.utils;
 
+import android.app.ProgressDialog;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.coolweather.app.model.City;
 import com.coolweather.app.model.CoolWeatherDB;
@@ -81,5 +83,6 @@ public class Utility {
 		return false;
 
 	}
+	
 
 }

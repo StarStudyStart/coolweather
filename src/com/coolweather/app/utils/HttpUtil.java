@@ -8,7 +8,7 @@ import java.net.URL;
 
 public class HttpUtil {
 	public static void snedHttpRequest(final String address,
-			final HttpCallBackListener listener){
+			final HttpCallBackListener httpCallBackListener){
 		new Thread(new Runnable() {
 			
 			@Override
@@ -27,14 +27,14 @@ public class HttpUtil {
 					while((line = reader.readLine()) != null){
 						response.append(line);
 					}
-					if (listener != null) {
+					if (httpCallBackListener != null) {
 //						回调onFinish方法
-						listener.onFinish(response.toString());
+						httpCallBackListener.onFinish(response.toString());
 					}
 				} catch (Exception e) {
 //					回調onError方法
-					if (listener != null) {
-						listener.onError(e);
+					if (httpCallBackListener != null) {
+						httpCallBackListener.onError(e);
 					}
 					
 				}
