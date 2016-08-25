@@ -63,14 +63,22 @@ public class ChooseAreaActivity extends Activity {
 	 * 当前选中的级别
 	 */
 	private int currentLevel;
+	
+	/**
+	 * 是否从weatheractivity跳转过来
+	 * 
+	 */
+	private boolean isFromWeatherActivity;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
+		isFromWeatherActivity = getIntent().getBooleanExtra("from_weather_activity", false);
+		
 		SharedPreferences pref = PreferenceManager
 				.getDefaultSharedPreferences(this);
-		if (pref.getBoolean("city_selected", false)) {
+		if (pref.getBoolean("city_selected", false)&&!isFromWeatherActivity) {
 			Intent intent = new Intent(this, WeatherActivity.class);
 			startActivity(intent);
 			finish();
@@ -105,6 +113,7 @@ public class ChooseAreaActivity extends Activity {
 							WeatherActivity.class);
 					intent.putExtra("county_code", countyCode);
 					startActivity(intent);
+					finish();
 				}
 
 			}
@@ -273,6 +282,10 @@ public class ChooseAreaActivity extends Activity {
 		} else if (currentLevel == LEVEL_CITY) {
 			queryProvinces();
 		} else {
+			if (isFromWeatherActivity) {
+				Intent intent = new Intent(this,WeatherActivity.class);
+				startActivity(intent);
+			}
 			finish();
 		}
 	}

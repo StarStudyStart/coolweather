@@ -101,12 +101,13 @@ public class Utility {
 			JSONObject jsonObject = new JSONObject(response);
 			JSONObject weatherInfo = jsonObject.getJSONObject("weatherinfo");
 			String cityName = weatherInfo.getString("city");
+			String weatherCode = weatherInfo.getString("cityid");
 			String temp1 = weatherInfo.getString("temp1");
 			String temp2 = weatherInfo.getString("temp2");
 			String weatherDesp = weatherInfo.getString("weather");
 			String publishTime = weatherInfo.getString("ptime");
-			saveWeatherInfo(context, cityName, temp1, temp2, weatherDesp,
-					publishTime);
+			saveWeatherInfo(context, cityName, weatherCode, temp1, temp2,
+					weatherDesp, publishTime);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -116,8 +117,9 @@ public class Utility {
 	/**
 	 * 将一系列天气信息存入到
 	 */
-	private static void saveWeatherInfo(Context context, String cityName,
-			String temp1, String temp2, String weatherDesp, String publishTime) {
+	public static void saveWeatherInfo(Context context, String cityName,
+			String weatherCode, String temp1, String temp2, String weatherDesp,
+			String publishTime) {
 		// 获取当前时间
 		SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy年M月d日",
 				Locale.CHINA);
@@ -125,7 +127,9 @@ public class Utility {
 		// 获取本地存储对象
 		SharedPreferences.Editor editor = PreferenceManager
 				.getDefaultSharedPreferences(context).edit();
+		editor.clear();
 		editor.putString("city_name", cityName);
+		editor.putString("weather_code", weatherCode);
 		editor.putString("temp1", temp1);
 		editor.putString("temp2", temp2);
 		editor.putString("weather_Desp", weatherDesp);
