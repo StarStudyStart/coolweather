@@ -97,7 +97,7 @@ public class Utility {
 	 * 解析服务器返回的json数据，并且将解析出的数据存储到本地
 	 */
 	public static void handleWeatherInfoResponse(Context context,
-			String response) {
+			String response,String weatherCode) {
 		try {
 			JSONObject jsonObject = new JSONObject(response);
 			JSONObject weatherInfo = jsonObject.getJSONObject("data");
@@ -108,7 +108,7 @@ public class Utility {
 			String temp2 = jsonArray.getJSONObject(0).getString("high");
 			String weatherDesp = jsonArray.getJSONObject(0).getString("type");
 			saveWeatherInfo(context, cityName, currentTemp, temp1, temp2,
-					weatherDesp);
+					weatherDesp,weatherCode);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -119,7 +119,7 @@ public class Utility {
 	 * 将一系列天气信息存入到
 	 */
 	public static void saveWeatherInfo(Context context, String cityName,
-			String currentTemp, String temp1, String temp2, String weatherDesp) {
+			String currentTemp, String temp1, String temp2, String weatherDesp,String weatherCode) {
 		// 获取当前时间
 		SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy年M月d日",
 				Locale.CHINA);
@@ -134,6 +134,7 @@ public class Utility {
 		editor.putString("temp2", temp2);
 		editor.putString("weather_Desp", weatherDesp);
 		editor.putString("current_date", currentDate);
+		editor.putString("weather_code", weatherCode);
 		editor.putBoolean("city_selected", true);
 		editor.commit();
 

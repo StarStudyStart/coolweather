@@ -14,12 +14,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.coolweather.app.R;
+import com.coolweather.app.service.AutoUpdateWeatherService;
 import com.coolweather.app.utils.HttpCallBackListener;
 import com.coolweather.app.utils.HttpUtil;
 import com.coolweather.app.utils.Utility;
 
 public class WeatherActivity extends Activity implements OnClickListener {
-	private LinearLayout weatherInfoLayout;
+	private static LinearLayout weatherInfoLayout;
 
 	/**
 	 * 显示城市名称
@@ -65,6 +66,11 @@ public class WeatherActivity extends Activity implements OnClickListener {
 	 * 用於接收choosAreaActivity中傳遞過來的countycode
 	 */
 	private String countyCode;
+
+	/**
+	 * 用于接收返回的天气代码
+	 */
+	private String weatherCode = "";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -135,7 +141,7 @@ public class WeatherActivity extends Activity implements OnClickListener {
 				if ("weatherCode".equals(type)) {
 					// 处理服务器返回数据，获取天气信息。
 					Utility.handleWeatherInfoResponse(WeatherActivity.this,
-							response);
+							response, weatherCode);
 					runOnUiThread(new Runnable() {
 
 						@Override
@@ -148,7 +154,7 @@ public class WeatherActivity extends Activity implements OnClickListener {
 				} else if ("countyCode".equals(type)) {
 					// 处理服务器返回的数据，获取天气代码。
 					String[] array = response.split("\\|");
-					String weatherCode = array[1];
+					weatherCode = array[1];
 					queryWeatherInfo(weatherCode);
 
 				}
@@ -178,23 +184,28 @@ public class WeatherActivity extends Activity implements OnClickListener {
 	/**
 	 * 从本地sharePreference中读取天气信息
 	 */
-	private void showWeather() {
+	public void showWeather() {
 		SharedPreferences pref = PreferenceManager
 				.getDefaultSharedPreferences(this);
 		cityName.setText(pref.getString("city_name", ""));
 		publishText.setText(pref.getString("current_date", ""));
-		currentTemp.setText(pref.getString("current_temp", "")+"℃");
+		currentTemp.setText(pref.getString("current_temp", "") + "℃");
 		weatherDesp.setText(pref.getString("weather_Desp", ""));
 		temp1.setText(pref.getString("temp1", ""));
 		temp2.setText(pref.getString("temp2", ""));
 		weatherInfoLayout.setVisibility(View.VISIBLE);
 		cityName.setVisibility(View.VISIBLE);
+		// 自动更新天气
+		/**
+		 * 这里设置个boolean变量，存入preference中
+		 * 
+		 */
+		autoUpdateWeather();
 
 	}
 
 	@Override
 	public void onClick(View v) {
-		// TODO Auto-generated method stub
 		switch (v.getId()) {
 		case R.id.switch_city:
 			Intent intent = new Intent(this, ChooseAreaActivity.class);
@@ -204,9 +215,6 @@ public class WeatherActivity extends Activity implements OnClickListener {
 			break;
 		case R.id.refresh_weather:
 			publishText.setText("同步中...");
-			SharedPreferences prefs = PreferenceManager
-					.getDefaultSharedPreferences(this);
-			String weatherCode = prefs.getString("weather_code", "");
 			if (!TextUtils.isEmpty(weatherCode)) {
 				queryWeatherInfo(weatherCode);
 			} else {
@@ -219,4 +227,19 @@ public class WeatherActivity extends Activity implements OnClickListener {
 			break;
 		}
 	}
+
+	/**
+	 * 自动更新天气信息
+	 */
+	private void autoUpdateWeather() {
+		Intent intentService = new Intent(this, AutoUpdateWeatherService.class);
+		startService(intentService);
+	}
+
+	@Override
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
+	}
+
 }
