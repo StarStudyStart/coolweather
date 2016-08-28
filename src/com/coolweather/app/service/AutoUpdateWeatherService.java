@@ -20,6 +20,8 @@ public class AutoUpdateWeatherService extends Service {
 	private AlarmManager alarmManager;
 	private PendingIntent pi;
 
+	// private boolean isUpdateSucc;
+
 	@Override
 	public IBinder onBind(Intent intent) {
 		// TODO Auto-generated method stub
@@ -78,17 +80,23 @@ public class AutoUpdateWeatherService extends Service {
 					Utility.handleWeatherInfoResponse(
 							AutoUpdateWeatherService.this, response,
 							weatherCode);
+					/*
+					 * if (isUpdateSucc) {
+					 * Toast.makeText(AutoUpdateWeatherService.this,
+					 * "随心行-天气更新成功", Toast.LENGTH_SHORT).show(); } else {
+					 * Toast.makeText(AutoUpdateWeatherService.this,
+					 * "随心行-天气读取数据失败", Toast.LENGTH_SHORT).show(); }
+					 */
 				}
 
 				@Override
 				public void onError(Exception e) {
-					// TODO Auto-generated method stub
 					Toast.makeText(AutoUpdateWeatherService.this, "自动更新失败",
 							Toast.LENGTH_SHORT).show();
 				}
 			});
 		} else {
-			Toast.makeText(this, "天气代码为空", Toast.LENGTH_SHORT).show();
+			// Toast.makeText(this, "天气代码为空", Toast.LENGTH_SHORT).show();
 		}
 	}
 

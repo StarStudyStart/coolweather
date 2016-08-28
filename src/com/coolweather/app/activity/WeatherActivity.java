@@ -1,5 +1,7 @@
 package com.coolweather.app.activity;
 
+import java.util.Calendar;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,6 +13,7 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.coolweather.app.R;
@@ -20,7 +23,8 @@ import com.coolweather.app.utils.HttpUtil;
 import com.coolweather.app.utils.Utility;
 
 public class WeatherActivity extends Activity implements OnClickListener {
-	private static LinearLayout weatherInfoLayout;
+	private LinearLayout weatherInfoLayout;
+	private RelativeLayout weather_layout;
 
 	/**
 	 * 显示城市名称
@@ -79,6 +83,7 @@ public class WeatherActivity extends Activity implements OnClickListener {
 		setContentView(R.layout.activity_weather);
 		// 寻找控件
 		weatherInfoLayout = (LinearLayout) findViewById(R.id.weather_info_layout);
+		weather_layout = (RelativeLayout) findViewById(R.id.weather_layout);
 		cityName = (TextView) findViewById(R.id.city_name);
 		publishText = (TextView) findViewById(R.id.publish_text);
 		currentTemp = (TextView) findViewById(R.id.current_temp);
@@ -190,9 +195,21 @@ public class WeatherActivity extends Activity implements OnClickListener {
 		cityName.setText(pref.getString("city_name", ""));
 		publishText.setText(pref.getString("current_date", ""));
 		currentTemp.setText(pref.getString("current_temp", "") + "℃");
-		weatherDesp.setText(pref.getString("weather_Desp", ""));
-		temp1.setText(pref.getString("temp1", ""));
-		temp2.setText(pref.getString("temp2", ""));
+		String type = pref.getString("weather_Desp", "");
+		weatherDesp.setText(type);
+		temp1.setText(pref.getString("low_temp", ""));
+		temp2.setText(pref.getString("high_temp", ""));
+		// 获取当前时间
+		long time = System.currentTimeMillis();
+		final Calendar mCalendar = Calendar.getInstance();
+		mCalendar.setTimeInMillis(time);
+		// 获得24小时制的时间
+		int hour = mCalendar.get(Calendar.HOUR_OF_DAY);
+		if (hour > 18 || hour < 6) {
+			setNightBackground(type);
+		} else {
+			setDayBackgroud(type);
+		}
 		weatherInfoLayout.setVisibility(View.VISIBLE);
 		cityName.setVisibility(View.VISIBLE);
 		// 自动更新天气
@@ -234,6 +251,52 @@ public class WeatherActivity extends Activity implements OnClickListener {
 	private void autoUpdateWeather() {
 		Intent intentService = new Intent(this, AutoUpdateWeatherService.class);
 		startService(intentService);
+	}
+
+	/**
+	 * 根据得到的天气类型，设置白天的背景图片
+	 * 
+	 * @param type
+	 */
+	private void setDayBackgroud(String type) {
+		if ("晴".equals(type)) {
+			weather_layout.setBackgroundResource(R.drawable.sunny);
+		} else if ("多云".equals(type)) {
+			weather_layout.setBackgroundResource(R.drawable.overcast_sky);
+		} else if ("雷阵雨".equals(type)) {
+			weather_layout.setBackgroundResource(R.drawable.rainstorm);
+		} else if ("小雨".equals(type) || "中雨".equals(type)) {
+			weather_layout.setBackgroundResource(R.drawable.rain_m);
+		} else if ("阵雨".equals(type) || "大雨".equals(type) || "暴雨".equals(type)
+				|| "大暴雨".equals(type) || "特大暴雨".equals(type)) {
+			weather_layout.setBackgroundResource(R.drawable.rain_l);
+		} else if ("小雪".equals(type) || "中雪".equals(type)) {
+			weather_layout.setBackgroundResource(R.drawable.snow_m);
+
+		} else if ("大雪".equals(type) || "暴雪".equals(type) || "阵雪".equals(type)) {
+			weather_layout.setBackgroundResource(R.drawable.snowy_l);
+		} else if ("雾".equals(type) || "大雾".equals(type) || "霾".equals(type)) {
+			weather_layout.setBackgroundResource(R.drawable.foggy);
+		} else if ("阴".equals(type)) {
+			weather_layout.setBackgroundResource(R.drawable.cloudy);
+
+		} else if ("沙尘暴".equals(type)) {
+			weather_layout.setBackgroundResource(R.drawable.dirt);
+		}
+
+	}
+
+	/**
+	 * 根据得到的天气类型，设置夜晚的背景图片
+	 * 
+	 * @param type
+	 */
+	private void setNightBackground(String type) {
+		if ("晴".equals(type)) {
+			weather_layout.setBackgroundResource(R.drawable.night_sunny);
+		} else {
+			weather_layout.setBackgroundResource(R.drawable.night_other);
+		}
 	}
 
 	@Override

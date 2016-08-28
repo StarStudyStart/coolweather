@@ -96,30 +96,42 @@ public class Utility {
 	/**
 	 * 解析服务器返回的json数据，并且将解析出的数据存储到本地
 	 */
-	public static void handleWeatherInfoResponse(Context context,
-			String response,String weatherCode) {
+	public static boolean handleWeatherInfoResponse(Context context,
+			String response, String weatherCode) {
 		try {
 			JSONObject jsonObject = new JSONObject(response);
 			JSONObject weatherInfo = jsonObject.getJSONObject("data");
 			String cityName = weatherInfo.getString("city");
 			String currentTemp = weatherInfo.getString("wendu");
 			JSONArray jsonArray = weatherInfo.getJSONArray("forecast");
+			
 			String temp1 = jsonArray.getJSONObject(0).getString("low");
+			String[] array1 = temp1.split(" ");
+			String lowTemp = array1[1];
+			
 			String temp2 = jsonArray.getJSONObject(0).getString("high");
+			String[] array2 = temp2.split(" ");
+			String highTemp = array2[1];
+			
 			String weatherDesp = jsonArray.getJSONObject(0).getString("type");
-			saveWeatherInfo(context, cityName, currentTemp, temp1, temp2,
-					weatherDesp,weatherCode);
+			saveWeatherInfo(context, cityName, currentTemp, lowTemp, highTemp,
+					weatherDesp, weatherCode);
+			if (cityName != null && weatherDesp != null && weatherDesp != null) {
+				return true;
+			}
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return false;
 	}
 
 	/**
 	 * 将一系列天气信息存入到
 	 */
 	public static void saveWeatherInfo(Context context, String cityName,
-			String currentTemp, String temp1, String temp2, String weatherDesp,String weatherCode) {
+			String currentTemp, String lowTemp, String highTemp, String weatherDesp,
+			String weatherCode) {
 		// 获取当前时间
 		SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy年M月d日",
 				Locale.CHINA);
@@ -130,12 +142,13 @@ public class Utility {
 		editor.clear();
 		editor.putString("city_name", cityName);
 		editor.putString("current_temp", currentTemp);
-		editor.putString("temp1", temp1);
-		editor.putString("temp2", temp2);
+		editor.putString("low_temp", lowTemp);
+		editor.putString("high_temp", highTemp);
 		editor.putString("weather_Desp", weatherDesp);
 		editor.putString("current_date", currentDate);
 		editor.putString("weather_code", weatherCode);
 		editor.putBoolean("city_selected", true);
+
 		editor.commit();
 
 	}
